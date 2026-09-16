@@ -18,3 +18,11 @@ def test_returns_none_on_404(httpserver: HTTPServer):
     httpserver.expect_request("/users/999").respond_with_data(status=404)
     client = UserClient(httpserver.url_for(""))
     assert client.fetch_user(999) is None
+
+def test_returns_none_when_missing_fields(httpserver: HTTPServer):
+    httpserver.expect_request("/users/5").respond_with_json(
+        {"id": 5, "first": "John"}, status=200  # Falta el campo 'last'
+    )
+    client = UserClient(httpserver.url_for(""))
+    assert client.fetch_user(5) is None
+
